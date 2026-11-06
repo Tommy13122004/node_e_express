@@ -19,7 +19,6 @@ app.get("/tarefas", (req, res) => {
 
 app.get("/tarefas/:id", (req, res) => {
   const idURL = parseInt(req.params.id);
-  console.log(idURL);
   if (Number.isNaN(idURL)) {
     return res.status(400).json({ mensagem: "O id tem de ser um número" });
   }
@@ -28,6 +27,23 @@ app.get("/tarefas/:id", (req, res) => {
     return res.status(404).json({ mensagem: "Tarefa não encontrada" });
   }
   res.json(tarefa);
+});
+
+app.post("/tarefas", (req, res) => {
+  if (!req.body?.titulo) {
+    return res.status(400).json({ mensagem: "Pedido mal feito" });
+  }
+  const novaTarefa = {};
+  if (tarefas.length === 0){
+    novaTarefa.id = 1;
+  }
+  else{
+    const ultimoID = Math.max(...tarefas.map((tarefa) => tarefa.id));
+    novaTarefa.id = ultimoID + 1;
+  }
+  novaTarefa.titulo = req.body.titulo;
+  tarefas.push(novaTarefa);
+  res.status(201).json(novaTarefa);
 });
 
 app.listen(3000, () => {
