@@ -4,10 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-let tarefas = [
-  { id: 1, titulo: "tarefa 1" },
-  { id: 2, titulo: "tarefa 2" },
-];
+let tarefas = [];
 
 app.get("/", (req, res) => {
   res.send("Olá, servidor!");
@@ -44,6 +41,19 @@ app.post("/tarefas", (req, res) => {
   novaTarefa.titulo = req.body.titulo;
   tarefas.push(novaTarefa);
   res.status(201).json(novaTarefa);
+});
+
+app.delete("/tarefas/:id", (req, res) =>{
+  const idURL = parseInt(req.params.id);
+  if (Number.isNaN(idURL)) {
+    return res.status(400).json({ mensagem: "O id tem de ser um número" });
+  }
+  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
+  if (tarefa === undefined) {
+    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
+  }
+  tarefas = tarefas.filter(tarefaAtual => tarefaAtual.id !== idURL);
+  res.status(204).end();
 });
 
 app.listen(3000, () => {
