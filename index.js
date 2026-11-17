@@ -2,7 +2,23 @@ const express = require("express");
 
 const app = express();
 
+//const router = express.Router();
+
 app.use(express.json());
+
+/* router.use(
+  '/tarefas/:id',
+  (req,res, next) => {
+    const idURL = parseInt(req.params.id);
+  if (Number.isNaN(idURL)) {
+    return res.status(400).json({ mensagem: "O id tem de ser um número" });
+  }
+  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
+  if (tarefa === undefined) {
+    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
+  }
+  }
+); */
 
 let tarefas = [];
 
@@ -54,6 +70,22 @@ app.delete("/tarefas/:id", (req, res) =>{
   }
   tarefas = tarefas.filter(tarefaAtual => tarefaAtual.id !== idURL);
   res.status(204).end();
+});
+
+app.put("/tarefas/:id", (req, res) =>{
+  const idURL = parseInt(req.params.id);
+  if (Number.isNaN(idURL)) {
+    return res.status(400).json({ mensagem: "O id tem de ser um número" });
+  }
+  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
+  if (tarefa === undefined) {
+    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
+  }
+  if (!req.body?.titulo) {
+    return res.status(400).json({ mensagem: "Pedido mal feito" });
+  }
+  tarefa.titulo = req.body.titulo;
+  res.json(tarefa);
 });
 
 app.listen(3000, () => {
