@@ -2,11 +2,9 @@ const express = require("express");
 
 const app = express();
 
-//const router = express.Router();
-
 app.use(express.json());
 
-/* router.use(
+app.use(
   '/tarefas/:id',
   (req,res, next) => {
     const idURL = parseInt(req.params.id);
@@ -17,8 +15,10 @@ app.use(express.json());
   if (tarefa === undefined) {
     return res.status(404).json({ mensagem: "Tarefa não encontrada" });
   }
+  req.tarefa = tarefa;
+  next();
   }
-); */
+);
 
 let tarefas = [];
 
@@ -31,15 +31,7 @@ app.get("/tarefas", (req, res) => {
 });
 
 app.get("/tarefas/:id", (req, res) => {
-  const idURL = parseInt(req.params.id);
-  if (Number.isNaN(idURL)) {
-    return res.status(400).json({ mensagem: "O id tem de ser um número" });
-  }
-  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
-  if (tarefa === undefined) {
-    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
-  }
-  res.json(tarefa);
+  res.json(req.tarefa);
 });
 
 app.post("/tarefas", (req, res) => {
@@ -60,32 +52,16 @@ app.post("/tarefas", (req, res) => {
 });
 
 app.delete("/tarefas/:id", (req, res) =>{
-  const idURL = parseInt(req.params.id);
-  if (Number.isNaN(idURL)) {
-    return res.status(400).json({ mensagem: "O id tem de ser um número" });
-  }
-  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
-  if (tarefa === undefined) {
-    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
-  }
-  tarefas = tarefas.filter(tarefaAtual => tarefaAtual.id !== idURL);
+  tarefas = tarefas.filter(tarefaAtual => tarefaAtual.id !== req.tarefa.id);
   res.status(204).end();
 });
 
 app.put("/tarefas/:id", (req, res) =>{
-  const idURL = parseInt(req.params.id);
-  if (Number.isNaN(idURL)) {
-    return res.status(400).json({ mensagem: "O id tem de ser um número" });
-  }
-  const tarefa = tarefas.find((tarefaAtual) => tarefaAtual.id === idURL);
-  if (tarefa === undefined) {
-    return res.status(404).json({ mensagem: "Tarefa não encontrada" });
-  }
   if (!req.body?.titulo) {
     return res.status(400).json({ mensagem: "Pedido mal feito" });
   }
-  tarefa.titulo = req.body.titulo;
-  res.json(tarefa);
+  req.tarefa.titulo = req.body.titulo;
+  res.json(req.tarefa);
 });
 
 app.listen(3000, () => {
